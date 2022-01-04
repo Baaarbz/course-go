@@ -13,7 +13,7 @@ import (
 	"testing"
 )
 
-func TestHandler_Create(t *testing.T) {
+func Test_Handler_Create(t *testing.T) {
 	courseRepository := new(mocks.CourseRepository)
 	courseRepository.On("Save", mock.Anything, mock.AnythingOfType("domain.Course")).Return(nil)
 
@@ -44,9 +44,9 @@ func TestHandler_Create(t *testing.T) {
 
 	t.Run("given a valid request it returns 201", func(t *testing.T) {
 		createCourseReq := createRequest{
-			ID:       "357a6c62-94d5-4b22-9917-ca79d91867bc",
-			Name:     "Test Course",
-			Duration: "10 months",
+			ID:          "357a6c62-94d5-4b22-9917-ca79d91867bc",
+			Name:        "Test Course",
+			Description: "A long description of this test course.",
 		}
 
 		b, err := json.Marshal(createCourseReq)

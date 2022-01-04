@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	courseTable = "courses"
+	courseTable = "course"
 )
 
 // CourseRepository is a Postgres platform.CourseRepository implementation.
@@ -26,12 +26,11 @@ func NewCourseRepository(db *sql.DB) *CourseRepository {
 
 // Save implements the platform.CourseRepository
 func (r *CourseRepository) Save(ctx context.Context, course domain.Course) error {
-	courseSQLStruct := sqlbuilder.NewStruct(new(sqlBuilderCourse))
-	query, args := courseSQLStruct.InsertInto(courseTable, sqlBuilderCourse{
-		ID:          course.ID(),
+	courseSQLStruct := sqlbuilder.NewStruct(new(sqlBuilderCreateCourse))
+	query, args := courseSQLStruct.InsertInto(courseTable, sqlBuilderCreateCourse{
 		Name:        course.Name(),
 		Description: course.Description(),
-	}).Build()
+	}).BuildWithFlavor(sqlbuilder.PostgreSQL)
 
 	_, err := r.db.ExecContext(ctx, query, args...)
 	if err != nil {

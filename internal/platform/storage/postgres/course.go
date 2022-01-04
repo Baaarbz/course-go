@@ -5,3 +5,8 @@ type sqlBuilderCourse struct {
 	Name        string `db:"name"`
 	Description string `db:"description"`
 }
+
+type sqlBuilderCreateCourse struct {
+	Name        string `db:"name"`
+	Description string `db:"description"`
+}

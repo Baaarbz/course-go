@@ -16,11 +16,11 @@ const (
 	dbPass = "admin"
 	dbHost = "localhost"
 	dbPort = "5432"
-	dbName = "course-go"
+	dbName = "course_go"
 )
 
 func Run() error {
-	postgresURI := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", dbUser, dbPass, dbHost, dbPort, dbName)
+	postgresURI := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPass, dbHost, dbPort, dbName)
 	db, err := sql.Open("postgres", postgresURI)
 	if err != nil {
 		return err
