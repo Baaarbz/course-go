@@ -5,10 +5,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/huandu/go-sqlbuilder"
 )
 
 const (
-	insert      = "insert into $1 (name, duration) values ($2, $3)"
 	courseTable = "courses"
 )
 
@@ -26,7 +26,14 @@ func NewCourseRepository(db *sql.DB) *CourseRepository {
 
 // Save implements the platform.CourseRepository
 func (r *CourseRepository) Save(ctx context.Context, course domain.Course) error {
-	_, err := r.db.ExecContext(ctx, insert, courseTable, course.Name(), course.Duration())
+	courseSQLStruct := sqlbuilder.NewStruct(new(sqlBuilderCourse))
+	query, args := courseSQLStruct.InsertInto(courseTable, sqlBuilderCourse{
+		ID:          course.ID(),
+		Name:        course.Name(),
+		Description: course.Description(),
+	}).Build()
+
+	_, err := r.db.ExecContext(ctx, query, args...)
 	if err != nil {
 		return fmt.Errorf("error trying to persist course on database: %v", err)
 	}
