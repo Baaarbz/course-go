@@ -11,17 +11,17 @@ type CourseRepository interface {
 
 // Course is the data structure that represents a course.
 type Course struct {
-	id       string
-	name     string
-	duration string
+	id          string
+	name        string
+	description string
 }
 
 // NewCourse creates a new course.
-func NewCourse(id, name, duration string) Course {
+func NewCourse(id, name, description string) Course {
 	return Course{
-		id:       id,
-		name:     name,
-		duration: duration,
+		id:          id,
+		name:        name,
+		description: description,
 	}
 }
 
@@ -35,7 +35,7 @@ func (c Course) Name() string {
 	return c.name
 }
 
-// Duration returns the course duration.
-func (c Course) Duration() string {
-	return c.duration
+// Description returns the course duration.
+func (c Course) Description() string {
+	return c.description
 }

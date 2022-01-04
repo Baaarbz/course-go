@@ -7,9 +7,9 @@ import (
 )
 
 type createRequest struct {
-	ID       string `json:"id" binding:"required"`
-	Name     string `json:"name" binding:"required"`
-	Duration string `json:"duration" binding:"required"`
+	ID          string `json:"id" binding:"required"`
+	Name        string `json:"name" binding:"required"`
+	Description string `json:"description" binding:"required"`
 }
 
 // CreateHandler returns an HTTP handler for courses creation.
@@ -21,7 +21,7 @@ func CreateHandler(courseRepository domain.CourseRepository) gin.HandlerFunc {
 			return
 		}
 
-		course := domain.NewCourse(req.ID, req.Name, req.Duration)
+		course := domain.NewCourse(req.ID, req.Name, req.Description)
 		if err := courseRepository.Save(ctx, course); err != nil {
 			ctx.JSON(http.StatusInternalServerError, err.Error())
 			return
