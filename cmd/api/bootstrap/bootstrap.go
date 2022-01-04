@@ -1,13 +1,33 @@
 package bootstrap
 
-import "barbz.dev/course-go/internal/platform/server"
+import (
+	"barbz.dev/course-go/internal/platform/server"
+	"barbz.dev/course-go/internal/platform/storage/postgres"
+	"database/sql"
+	"fmt"
+	_ "github.com/lib/pq"
+)
 
 const (
 	host = "localhost"
 	port = 8080
+
+	dbUser = "postgres"
+	dbPass = "admin"
+	dbHost = "localhost"
+	dbPort = "5432"
+	dbName = "course-go"
 )
 
 func Run() error {
-	srv := server.New(host, port)
+	postgresURI := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", dbUser, dbPass, dbHost, dbPort, dbName)
+	db, err := sql.Open("postgres", postgresURI)
+	if err != nil {
+		return err
+	}
+
+	courseRepository := postgres.NewCourseRepository(db)
+
+	srv := server.New(host, port, courseRepository)
 	return srv.Run()
 }
