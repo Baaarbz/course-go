@@ -1,7 +1,8 @@
 package courses
 
 import (
-	domain "barbz.dev/course-go/internal/platform"
+	"barbz.dev/course-go/internal/pkg/course"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -13,7 +14,7 @@ type createRequest struct {
 }
 
 // CreateHandler returns an HTTP handler for courses creation.
-func CreateHandler(courseRepository domain.CourseRepository) gin.HandlerFunc {
+func CreateHandler(courseService course.Service) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var req createRequest
 		if err := ctx.BindJSON(&req); err != nil {
@@ -21,10 +22,15 @@ func CreateHandler(courseRepository domain.CourseRepository) gin.HandlerFunc {
 			return
 		}
 
-		course := domain.NewCourse(req.ID, req.Name, req.Description)
-		if err := courseRepository.Save(ctx, course); err != nil {
-			ctx.JSON(http.StatusInternalServerError, err.Error())
-			return
+		if err := courseService.CreateCourse(ctx, req.ID, req.Name, req.Description); err != nil {
+			switch {
+			case errors.Is(err, course.ErrInvalidArgument):
+				ctx.JSON(http.StatusBadRequest, err.Error())
+				return
+			default:
+				ctx.JSON(http.StatusInternalServerError, err.Error())
+				return
+			}
 		}
 
 		ctx.Status(http.StatusCreated)

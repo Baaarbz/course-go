@@ -1,6 +1,7 @@
 package courses
 
 import (
+	"barbz.dev/course-go/internal/pkg/course"
 	"barbz.dev/course-go/internal/platform/storage/mocks"
 	"bytes"
 	"encoding/json"
@@ -15,15 +16,18 @@ import (
 
 func Test_Handler_Create(t *testing.T) {
 	courseRepository := new(mocks.CourseRepository)
-	courseRepository.On("Save", mock.Anything, mock.AnythingOfType("domain.Course")).Return(nil)
+	courseRepository.
+		On("Save", mock.Anything, mock.AnythingOfType("domain.Course")).
+		Return(nil)
+
+	courseService := course.NewCourseService(courseRepository)
 
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
-	r.POST("/courses", CreateHandler(courseRepository))
+	r.POST("/courses", CreateHandler(courseService))
 
 	t.Run("given an invalid request it returns 400", func(t *testing.T) {
 		createCourseReq := createRequest{
-			ID:   "357a6c62-94d5-4b22-9917-ca79d91867bc",
 			Name: "Test Course",
 		}
 
@@ -44,7 +48,6 @@ func Test_Handler_Create(t *testing.T) {
 
 	t.Run("given a valid request it returns 201", func(t *testing.T) {
 		createCourseReq := createRequest{
-			ID:          "357a6c62-94d5-4b22-9917-ca79d91867bc",
 			Name:        "Test Course",
 			Description: "A long description of this test course.",
 		}

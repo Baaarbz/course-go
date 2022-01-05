@@ -1,7 +1,7 @@
 package server
 
 import (
-	domain "barbz.dev/course-go/internal/platform"
+	"barbz.dev/course-go/internal/pkg/course"
 	"barbz.dev/course-go/internal/platform/server/handler/courses"
 	"barbz.dev/course-go/internal/platform/server/handler/health"
 	"fmt"
@@ -10,28 +10,29 @@ import (
 )
 
 type Server struct {
-	engine           *gin.Engine
-	httpAddr         string
-	courseRepository domain.CourseRepository
+	engine        *gin.Engine
+	httpAddr      string
+	courseService course.Service
 }
 
-func New(host string, port uint, courseRepository domain.CourseRepository) Server {
+func New(host string, port uint, courseService course.Service) Server {
 	srv := Server{
-		engine:           gin.New(),
-		httpAddr:         fmt.Sprintf("%s:%d", host, port),
-		courseRepository: courseRepository,
+		engine:   gin.New(),
+		httpAddr: fmt.Sprintf("%s:%d", host, port),
+		// Dependencies
+		courseService: courseService,
 	}
 
 	srv.registerRoutes()
 	return srv
 }
 
-func (s Server) Run() error {
+func (s *Server) Run() error {
 	log.Println("Server running on", s.httpAddr)
 	return s.engine.Run(s.httpAddr)
 }
 
-func (s Server) registerRoutes() {
+func (s *Server) registerRoutes() {
 	s.engine.GET("/health", health.CheckHandler())
-	s.engine.POST("/courses", courses.CreateHandler(s.courseRepository))
+	s.engine.POST("/courses", courses.CreateHandler(s.courseService))
 }

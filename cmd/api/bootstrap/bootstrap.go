@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"barbz.dev/course-go/internal/pkg/course"
 	"barbz.dev/course-go/internal/platform/server"
 	"barbz.dev/course-go/internal/platform/storage/postgres"
 	"database/sql"
@@ -27,7 +28,8 @@ func Run() error {
 	}
 
 	courseRepository := postgres.NewCourseRepository(db)
+	courseService := course.NewCourseService(courseRepository)
 
-	srv := server.New(host, port, courseRepository)
+	srv := server.New(host, port, courseService)
 	return srv.Run()
 }

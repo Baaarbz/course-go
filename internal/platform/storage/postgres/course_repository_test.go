@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	domain "barbz.dev/course-go/internal/platform"
+	domain "barbz.dev/course-go/internal"
 	"context"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"

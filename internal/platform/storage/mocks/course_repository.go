@@ -3,9 +3,9 @@
 package mocks
 
 import (
+	domain "barbz.dev/course-go/internal"
 	context "context"
 
-	domain "barbz.dev/course-go/internal/platform"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -14,7 +14,30 @@ type CourseRepository struct {
 	mock.Mock
 }
 
-// Save provides a mock function with given fields: ctx, course
+// FindAll provides a mock function with given fields: ctx
+func (_m *CourseRepository) FindAll(ctx context.Context) ([]domain.Course, error) {
+	ret := _m.Called(ctx)
+
+	var r0 []domain.Course
+	if rf, ok := ret.Get(0).(func(context.Context) []domain.Course); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.Course)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Save provides a mock function with given fields: ctx, pkg
 func (_m *CourseRepository) Save(ctx context.Context, course domain.Course) error {
 	ret := _m.Called(ctx, course)
 
