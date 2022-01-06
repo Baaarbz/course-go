@@ -15,7 +15,7 @@ type Service interface {
 	CreateCourse(ctx context.Context, id, name, duration string) error
 
 	// FindAllCourses retrieve all registered courses
-	FindAllCourses(ctx context.Context) ([]domain.Course, error)
+	FindAllCourses(ctx context.Context) ([]DTO, error)
 }
 
 type service struct {
@@ -39,6 +39,32 @@ func (s *service) CreateCourse(ctx context.Context, id, name, description string
 }
 
 // FindAllCourses implements the course.Service interface.
-func (s *service) FindAllCourses(ctx context.Context) ([]domain.Course, error) {
-	return s.courseRepository.FindAll(ctx)
+func (s *service) FindAllCourses(ctx context.Context) ([]DTO, error) {
+	courses, err := s.courseRepository.FindAll(ctx)
+	return mapListCourseToDto(courses), err
+}
+
+type DTO struct {
+	ID          string `json:"id"`
+	Name        string `json:"name" binding:"required"`
+	Description string `json:"description" binding:"required"`
+}
+
+func mapListCourseToDto(courses []domain.Course) []DTO {
+	coursesDto := make([]DTO, len(courses))
+	for index, element := range courses {
+		// _ is the index where we are
+		// element is the element from courses for where we are
+		course := mapCourseToDto(element)
+		coursesDto[index] = course
+	}
+	return coursesDto
+}
+
+func mapCourseToDto(course domain.Course) DTO {
+	return DTO{
+		ID:          course.ID(),
+		Name:        course.Name(),
+		Description: course.Description(),
+	}
 }

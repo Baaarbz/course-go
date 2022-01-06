@@ -34,7 +34,7 @@ func (r *CourseRepository) Save(ctx context.Context, course domain.Course) error
 
 	_, err := r.db.ExecContext(ctx, query, args...)
 	if err != nil {
-		return fmt.Errorf("error trying to persist pkg on database: %v", err)
+		return fmt.Errorf("error trying to persist courses on database: %v", err)
 	}
 	return nil
 }
@@ -53,12 +53,13 @@ func (r *CourseRepository) FindAll(ctx context.Context) ([]domain.Course, error)
 
 	defer rows.Close()
 	for rows.Next() {
-		var course domain.Course
-		if err := rows.Scan(&course); err != nil {
+		var id, name, description string
+		if err := rows.Scan(&id, &name, &description); err != nil {
 			// Check for a scan error.
 			// Query rows will be closed with defer.
 			return courses, fmt.Errorf("error trying to scan row results of courses: %v", err)
 		}
+		course := domain.NewCourse(id, name, description)
 		courses = append(courses, course)
 	}
 	return courses, nil
