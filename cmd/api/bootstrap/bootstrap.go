@@ -26,6 +26,10 @@ func Run() error {
 	if err != nil {
 		return err
 	}
+	// Ping DB to check if the connection was established successfully
+	if err = db.Ping(); err != nil {
+		return err
+	}
 
 	courseRepository := postgres.NewCourseRepository(db)
 	courseService := course.NewCourseService(courseRepository)
