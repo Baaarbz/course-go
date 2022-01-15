@@ -7,38 +7,53 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/kelseyhightower/envconfig"
 	_ "github.com/lib/pq"
 	"time"
 )
 
-const (
-	host            = "localhost"
-	port            = 8080
-	shutdownTimeout = 10 * time.Second
+type config struct {
+	// Server configuration
+	Host            string        `default:"0.0.0.0"`
+	Port            uint          `default:"8080"`
+	ShutdownTimeout time.Duration `default:"10s" split_words:"true"`
+	// Database configuration
+	DbUser    string        `required:"true" split_words:"true"`
+	DbPass    string        `required:"true" split_words:"true"`
+	DbHost    string        `required:"true" split_words:"true"`
+	DbPort    string        `required:"true" split_words:"true"`
+	DbName    string        `required:"true" split_words:"true"`
+	DbTimeout time.Duration `default:"5s" split_words:"true"`
+}
 
-	dbUser    = "postgres"
-	dbPass    = "admin"
-	dbHost    = "localhost"
-	dbPort    = "5432"
-	dbName    = "course_go"
-	dbTimeout = 5 * time.Second
-)
+var cfg config
 
 func Run() error {
+	// Load config
+	if err := envconfig.Process("course_go", &cfg); err != nil {
+		return err
+	}
+
 	db, err := initDatabase()
 	if err != nil {
 		return err
 	}
 
-	courseRepository := postgres.NewCourseRepository(db, dbTimeout)
+	courseRepository := postgres.NewCourseRepository(db, cfg.DbTimeout)
 	courseService := course.NewCourseService(courseRepository)
 
-	ctx, srv := server.New(context.Background(), host, port, courseService, shutdownTimeout)
+	ctx, srv := server.New(context.Background(), cfg.Host, cfg.Port, courseService, cfg.ShutdownTimeout)
 	return srv.Run(ctx)
 }
 
 func initDatabase() (*sql.DB, error) {
-	postgresURI := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPass, dbHost, dbPort, dbName)
+	postgresURI := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable",
+		cfg.DbUser,
+		cfg.DbPass,
+		cfg.DbHost,
+		cfg.DbPort,
+		cfg.DbName)
+
 	db, err := sql.Open("postgres", postgresURI)
 	if err != nil {
 		return nil, err
