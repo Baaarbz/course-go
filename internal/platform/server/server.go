@@ -4,6 +4,8 @@ import (
 	"barbz.dev/course-go/internal/pkg/course"
 	"barbz.dev/course-go/internal/platform/server/handler/courses"
 	"barbz.dev/course-go/internal/platform/server/handler/health"
+	"barbz.dev/course-go/internal/platform/server/middleware/logging"
+	"barbz.dev/course-go/internal/platform/server/middleware/recovery"
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -23,8 +25,12 @@ type Server struct {
 }
 
 func New(ctx context.Context, host string, port uint, courseService course.Service, shutdownTimeout time.Duration) (context.Context, Server) {
+	engine := gin.New()
+	// Register middlewares
+	engine.Use(recovery.Middleware(), logging.Middleware())
+
 	srv := Server{
-		engine:          gin.New(),
+		engine:          engine,
 		httpAddr:        fmt.Sprintf("%s:%d", host, port),
 		shutdownTimeout: shutdownTimeout,
 		courseService:   courseService,
