@@ -14,7 +14,7 @@ import (
 
 type config struct {
 	// Server configuration
-	Host            string        `default:"0.0.0.0"`
+	Host            string        `default:"localhost"`
 	Port            uint          `default:"8080"`
 	ShutdownTimeout time.Duration `default:"10s" split_words:"true"`
 	// Database configuration
