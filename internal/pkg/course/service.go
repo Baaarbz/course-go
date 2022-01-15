@@ -16,6 +16,9 @@ type Service interface {
 
 	// FindAllCourses retrieve all registered courses
 	FindAllCourses(ctx context.Context) ([]DTO, error)
+
+	// FindCourse retrieve course searching by id
+	FindCourse(ctx context.Context, id string) (DTO, error)
 }
 
 type service struct {
@@ -42,4 +45,10 @@ func (s *service) CreateCourse(ctx context.Context, courseDto DTO) error {
 func (s *service) FindAllCourses(ctx context.Context) ([]DTO, error) {
 	courses, err := s.courseRepository.FindAll(ctx)
 	return mapListCourseToDto(courses), err
+}
+
+// FindCourse implements the course.Service interface.
+func (s *service) FindCourse(ctx context.Context, id string) (DTO, error) {
+	course, err := s.courseRepository.FindById(ctx, id)
+	return mapCourseToDto(course), err
 }

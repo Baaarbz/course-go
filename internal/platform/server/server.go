@@ -64,6 +64,7 @@ func (s *Server) registerRoutes() {
 	s.engine.GET("/health", health.CheckHandler())
 	s.engine.POST("/courses", courses.CreateHandler(s.courseService))
 	s.engine.GET("/courses", courses.RetrieveAll(s.courseService))
+	s.engine.GET("/courses/:id", courses.RetrieveById(s.courseService))
 }
 
 func serverContext(ctx context.Context) context.Context {

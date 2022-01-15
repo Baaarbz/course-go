@@ -25,3 +25,22 @@ func RetrieveAll(courseService course.Service) gin.HandlerFunc {
 		}
 	}
 }
+func RetrieveById(courseService course.Service) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		crs, err := courseService.FindCourse(ctx, ctx.Param("id"))
+
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		switch {
+		case len(crs.ID) == 0:
+			ctx.Status(http.StatusNotFound)
+			return
+		default:
+			ctx.JSON(http.StatusOK, crs)
+			return
+		}
+	}
+}

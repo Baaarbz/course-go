@@ -6,6 +6,7 @@ import "context"
 type CourseRepository interface {
 	Save(ctx context.Context, course Course) error
 	FindAll(ctx context.Context) ([]Course, error)
+	FindById(ctx context.Context, id string) (Course, error)
 }
 
 //go:generate mockery --case=snake --outpkg=mocks --output=storage/mocks --name=CourseRepository

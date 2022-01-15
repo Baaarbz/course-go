@@ -54,7 +54,7 @@ func (r *CourseRepository) FindAll(ctx context.Context) ([]domain.Course, error)
 
 	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
-		return courses, fmt.Errorf("error trying to select all courses from database: %v", err)
+		return nil, fmt.Errorf("error trying to select all courses from database: %v", err)
 	}
 
 	defer rows.Close()
@@ -63,10 +63,37 @@ func (r *CourseRepository) FindAll(ctx context.Context) ([]domain.Course, error)
 		if err := rows.Scan(&id, &name, &description); err != nil {
 			// Check for a scan error.
 			// Query rows will be closed with defer.
-			return courses, fmt.Errorf("error trying to scan row results of courses: %v", err)
+			return nil, fmt.Errorf("error trying to scan row results of courses: %v", err)
 		}
 		course := domain.NewCourse(id, name, description)
 		courses = append(courses, course)
 	}
 	return courses, nil
+}
+
+// FindById implements the domain.CourseRepository
+func (r *CourseRepository) FindById(ctx context.Context, id string) (domain.Course, error) {
+	courseSQLStruct := sqlbuilder.NewStruct(new(sqlBuilderCourse))
+
+	whereStatement := fmt.Sprintf("id = '%s'", id)
+	query, _ := courseSQLStruct.SelectFrom(courseTable).Where(whereStatement).BuildWithFlavor(sqlbuilder.PostgreSQL)
+
+	rows, err := r.db.QueryContext(ctx, query)
+
+	var course domain.Course
+	if err != nil {
+		return course, fmt.Errorf("error trying to select course by id from database: %v", err)
+	}
+
+	defer rows.Close()
+	for rows.Next() {
+		var id, name, description string
+		if err := rows.Scan(&id, &name, &description); err != nil {
+			// Check for a scan error.
+			// Query rows will be closed with defer.
+			return course, fmt.Errorf("error trying to scan row results of courses: %v", err)
+		}
+		return domain.NewCourse(id, name, description), nil
+	}
+	return course, nil
 }
