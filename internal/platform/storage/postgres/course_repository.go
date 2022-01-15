@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/huandu/go-sqlbuilder"
+	"time"
 )
 
 const (
@@ -14,13 +15,15 @@ const (
 
 // CourseRepository is a Postgres domain.CourseRepository implementation.
 type CourseRepository struct {
-	db *sql.DB
+	db        *sql.DB
+	dbTimeout time.Duration
 }
 
 // NewCourseRepository initializes a Postgres-based implementation of domain.CourseRepository
-func NewCourseRepository(db *sql.DB) *CourseRepository {
+func NewCourseRepository(db *sql.DB, dbTimeout time.Duration) *CourseRepository {
 	return &CourseRepository{
-		db: db,
+		db:        db,
+		dbTimeout: dbTimeout,
 	}
 }
 
@@ -32,7 +35,10 @@ func (r *CourseRepository) Save(ctx context.Context, course domain.Course) error
 		Description: course.Description(),
 	}).BuildWithFlavor(sqlbuilder.PostgreSQL)
 
-	_, err := r.db.ExecContext(ctx, query, args...)
+	ctxTimeout, cancel := context.WithTimeout(ctx, r.dbTimeout)
+	defer cancel()
+
+	_, err := r.db.ExecContext(ctxTimeout, query, args...)
 	if err != nil {
 		return fmt.Errorf("error trying to persist courses on database: %v", err)
 	}

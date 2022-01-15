@@ -16,11 +16,12 @@ const (
 	port            = 8080
 	shutdownTimeout = 10 * time.Second
 
-	dbUser = "postgres"
-	dbPass = "admin"
-	dbHost = "localhost"
-	dbPort = "5432"
-	dbName = "course_go"
+	dbUser    = "postgres"
+	dbPass    = "admin"
+	dbHost    = "localhost"
+	dbPort    = "5432"
+	dbName    = "course_go"
+	dbTimeout = 5 * time.Second
 )
 
 func Run() error {
@@ -29,7 +30,7 @@ func Run() error {
 		return err
 	}
 
-	courseRepository := postgres.NewCourseRepository(db)
+	courseRepository := postgres.NewCourseRepository(db, dbTimeout)
 	courseService := course.NewCourseService(courseRepository)
 
 	ctx, srv := server.New(context.Background(), host, port, courseService, shutdownTimeout)
