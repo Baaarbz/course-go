@@ -7,11 +7,11 @@ services:
     environment:
       COURSE_GO_HOST: 0.0.0.0
       COURSE_GO_PORT: 8080
-      COURSE_GO_DB_USER: postgres
-      COURSE_GO_DB_PASS: admin
-      COURSE_GO_DB_HOST: postgres
-      COURSE_GO_DB_PORT: 5432
-      COURSE_GO_DB_NAME: course_go
+      COURSE_GO_DBUSER: postgres
+      COURSE_GO_DBPASS: admin
+      COURSE_GO_DBHOST: postgres
+      COURSE_GO_DBPORT: 5432
+      COURSE_GO_DBNAME: course_go
     ports:
       - "8080:8080"
     restart: on-failure

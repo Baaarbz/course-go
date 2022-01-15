@@ -16,14 +16,14 @@ type config struct {
 	// Server configuration
 	Host            string        `default:"localhost"`
 	Port            uint          `default:"8080"`
-	ShutdownTimeout time.Duration `default:"10s" split_words:"true"`
+	ShutdownTimeout time.Duration `default:"10s"`
 	// Database configuration
-	DbUser    string        `required:"true" split_words:"true"`
-	DbPass    string        `required:"true" split_words:"true"`
-	DbHost    string        `required:"true" split_words:"true"`
-	DbPort    string        `required:"true" split_words:"true"`
-	DbName    string        `required:"true" split_words:"true"`
-	DbTimeout time.Duration `default:"5s" split_words:"true"`
+	DbUser    string        `required:"true"`
+	DbPass    string        `required:"true"`
+	DbHost    string        `required:"true"`
+	DbPort    string        `required:"true"`
+	DbName    string        `required:"true"`
+	DbTimeout time.Duration `default:"5s"`
 }
 
 var cfg config
