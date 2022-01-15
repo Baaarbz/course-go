@@ -9,7 +9,7 @@ services:
       COURSE_GO_PORT: 8080
       COURSE_GO_DB_USER: postgres
       COURSE_GO_DB_PASS: admin
-      COURSE_GO_DB_HOST: course_go_db
+      COURSE_GO_DB_HOST: postgres
       COURSE_GO_DB_PORT: 5432
       COURSE_GO_DB_NAME: course_go
     ports:
@@ -17,12 +17,16 @@ services:
     restart: on-failure
 
   postgres:
-    container_name: course_go_db
+    container_name: postgres
     image: postgres
     environment:
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: course_go
     volumes:
+      - postgres_data:/var/lib/postgres
       - ./scripts:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
+
+volumes:
+  postgres_data:
