@@ -10,9 +10,11 @@ import (
 )
 
 func Test_Service_CreateCourse_RepositoryError(t *testing.T) {
-	courseId := ""
-	courseName := "Test course"
-	courseDescription := "A long description of this test course."
+	course := DTO{
+		ID:          "",
+		Name:        "Test course",
+		Description: "A long description of this test course.",
+	}
 
 	courseRepositoryMock := new(mocks.CourseRepository)
 	courseRepositoryMock.
@@ -20,37 +22,41 @@ func Test_Service_CreateCourse_RepositoryError(t *testing.T) {
 		Return(errors.New("test error"))
 
 	courseService := NewCourseService(courseRepositoryMock)
-	err := courseService.CreateCourse(context.Background(), courseId, courseName, courseDescription)
+	err := courseService.CreateCourse(context.Background(), course)
 
 	courseRepositoryMock.AssertExpectations(t)
 	assert.Error(t, err)
 }
 
 func Test_Service_CreateCourse_InvalidArguments(t *testing.T) {
-	courseId := ""
-	courseName := ""
-	courseDescription := "A long description of this test course."
+	course := DTO{
+		ID:          "",
+		Name:        "",
+		Description: "A long description of this test course.",
+	}
 
 	courseRepositoryMock := new(mocks.CourseRepository)
 	courseService := NewCourseService(courseRepositoryMock)
 
-	err := courseService.CreateCourse(context.Background(), courseId, courseName, courseDescription)
+	err := courseService.CreateCourse(context.Background(), course)
 
 	assert.Error(t, err)
 	assert.ErrorIs(t, err, ErrInvalidArgument)
 
-	courseName = "Test course"
-	courseDescription = ""
-	err = courseService.CreateCourse(context.Background(), courseId, courseName, courseDescription)
+	course.Name = "Test course"
+	course.Description = ""
+	err = courseService.CreateCourse(context.Background(), course)
 
 	assert.Error(t, err)
 	assert.ErrorIs(t, err, ErrInvalidArgument)
 }
 
 func Test_Service_CreateCourse_Succeed(t *testing.T) {
-	courseId := ""
-	courseName := "Test course"
-	courseDescription := "A long description of this test course."
+	course := DTO{
+		ID:          "",
+		Name:        "Test course",
+		Description: "A long description of this test course.",
+	}
 
 	courseRepositoryMock := new(mocks.CourseRepository)
 	courseRepositoryMock.
@@ -58,7 +64,7 @@ func Test_Service_CreateCourse_Succeed(t *testing.T) {
 		Return(nil)
 
 	courseService := NewCourseService(courseRepositoryMock)
-	err := courseService.CreateCourse(context.Background(), courseId, courseName, courseDescription)
+	err := courseService.CreateCourse(context.Background(), course)
 
 	courseRepositoryMock.AssertExpectations(t)
 	assert.NoError(t, err)

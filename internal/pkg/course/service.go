@@ -12,7 +12,7 @@ var ErrInvalidArgument = errors.New("invalid argument")
 // Service is the interface that provides courses methods.
 type Service interface {
 	// CreateCourse save a new instance of course
-	CreateCourse(ctx context.Context, id, name, duration string) error
+	CreateCourse(ctx context.Context, course DTO) error
 
 	// FindAllCourses retrieve all registered courses
 	FindAllCourses(ctx context.Context) ([]DTO, error)
@@ -30,11 +30,11 @@ func NewCourseService(courseRepository domain.CourseRepository) Service {
 }
 
 // CreateCourse implements the course.Service interface.
-func (s *service) CreateCourse(ctx context.Context, id, name, description string) error {
-	if len(name) == 0 || len(description) == 0 {
+func (s *service) CreateCourse(ctx context.Context, courseDto DTO) error {
+	if len(courseDto.Name) == 0 || len(courseDto.Description) == 0 {
 		return ErrInvalidArgument
 	}
-	course := domain.NewCourse(id, name, description)
+	course := mapDtoToCourse(courseDto)
 	return s.courseRepository.Save(ctx, course)
 }
 
@@ -42,29 +42,4 @@ func (s *service) CreateCourse(ctx context.Context, id, name, description string
 func (s *service) FindAllCourses(ctx context.Context) ([]DTO, error) {
 	courses, err := s.courseRepository.FindAll(ctx)
 	return mapListCourseToDto(courses), err
-}
-
-type DTO struct {
-	ID          string `json:"id"`
-	Name        string `json:"name" binding:"required"`
-	Description string `json:"description" binding:"required"`
-}
-
-func mapListCourseToDto(courses []domain.Course) []DTO {
-	coursesDto := make([]DTO, len(courses))
-	for index, element := range courses {
-		// _ is the index where we are
-		// element is the element from courses for where we are
-		course := mapCourseToDto(element)
-		coursesDto[index] = course
-	}
-	return coursesDto
-}
-
-func mapCourseToDto(course domain.Course) DTO {
-	return DTO{
-		ID:          course.ID(),
-		Name:        course.Name(),
-		Description: course.Description(),
-	}
 }
